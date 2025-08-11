@@ -63,7 +63,7 @@ dependencies {
 
 	modCompileOnlyApi "mezz.jei:jei-$mc_version-common-api:$jei_version"
 	modCompileOnlyApi "mezz.jei:jei-$mc_version-fabric-api:$jei_version"
-//	modImplementation "mezz.jei:jei-$mc_version-fabric:$jei_version"
+	modImplementation "mezz.jei:jei-$mc_version-fabric:$jei_version"
 
 	modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version"
 	modCompileOnlyApi "me.shedaniel:RoughlyEnoughItems-api-fabric:$rei_version"

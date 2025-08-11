@@ -155,7 +155,7 @@ public final class AADisabledRecipes {
                     if (baseItemJson.isJsonPrimitive())
                         baseItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(baseItemJson, "baseItem")));
                     else
-                        baseItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, baseItemJson), IllegalStateException::new);
+                        baseItem = Ingredient.fromJson(baseItemJson, false);
 
                     if (repairJson.getAsJsonObject().has("repairItem")) {
                         var repairItemJson = repairJson.getAsJsonObject().get("repairItem");
@@ -163,7 +163,7 @@ public final class AADisabledRecipes {
                         if (repairItemJson.isJsonPrimitive())
                             repairItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairItemJson, "repairItem")));
                         else
-                            repairItem = Util.getOrThrow(Ingredient.CODEC.parse(JsonOps.INSTANCE, repairJson.getAsJsonObject().get("repairItem")), IllegalStateException::new);
+                            repairItem = Ingredient.fromJson(repairJson.getAsJsonObject().get("repairItem"), true);
                     }
                 } else
                     baseItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairJson, "baseItem")));
@@ -185,7 +185,7 @@ public final class AADisabledRecipes {
                 if (repairItemJson.isJsonPrimitive())
                     repairItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairItemJson, "repairItem")));
                 else
-                    repairItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, repairItemJson), IllegalStateException::new);
+                    repairItem = Ingredient.fromJson(repairItemJson, false);
 
                 for (var repairStack : repairItem.getItems())
                     AnvilAPI.LOGGER.debug("Disabling repair recipes with {}", BuiltInRegistries.ITEM.getKey(repairStack.getItem()));
@@ -223,7 +223,7 @@ public final class AADisabledRecipes {
                             if (baseItemJson.isJsonPrimitive())
                                 baseItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(baseItemJson, "baseItem")));
                             else
-                                baseItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, baseItemJson), IllegalStateException::new);
+                                baseItem = Ingredient.fromJson(baseItemJson, false);
                         }
 
                         enchantment1 = BuiltInRegistries.ENCHANTMENT.get(new ResourceLocation(GsonHelper.getAsString(enchantmentJson.getAsJsonObject(), "enchantment")));
