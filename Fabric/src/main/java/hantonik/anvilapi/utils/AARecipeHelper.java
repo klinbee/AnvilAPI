@@ -2,25 +2,29 @@ package hantonik.anvilapi.utils;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import hantonik.anvilapi.event.callback.AddServerReloadListenerCallback;
-import hantonik.anvilapi.event.callback.RecipeUpdatedCallback;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import hantonik.anvilapi.event.callback.AARecipeManagerLoadedCallback;
+import hantonik.anvilapi.event.callback.AARecipesUpdatedCallback;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.Map;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AARecipeHelper {
     private static RecipeManager MANAGER;
 
-    public static void init() {
-        AddServerReloadListenerCallback.EVENT.register((resources, access) -> MANAGER = resources.getRecipeManager());
-        RecipeUpdatedCallback.EVENT.register(manager -> MANAGER = manager);
+    public static void register() {
+        AARecipeManagerLoadedCallback.EVENT.register(manager -> MANAGER = manager);
+    }
+
+    @Environment(EnvType.CLIENT)
+    public static void registerClient() {
+        AARecipesUpdatedCallback.EVENT.register(manager -> MANAGER = manager);
     }
 
     public static RecipeManager getRecipeManager() {
@@ -32,19 +36,19 @@ public final class AARecipeHelper {
         return MANAGER;
     }
 
-    public static Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> getRecipes() {
+    public static Map<RecipeType<?>, Map<ResourceLocation, RecipeHolder<?>>> getRecipes() {
         return getRecipeManager().recipes;
     }
 
-    public static <C extends Container, T extends Recipe<C>> Map<ResourceLocation, T> getRecipes(RecipeType<T> type) {
+    public static <C extends Container, T extends Recipe<C>> Map<ResourceLocation, RecipeHolder<T>> getRecipes(RecipeType<T> type) {
         return getRecipeManager().byType(type);
     }
 
-    public static void addRecipe(Recipe<?> recipe) {
-        getRecipeManager().recipes.computeIfAbsent(recipe.getType(), type -> Maps.newHashMap()).put(recipe.getId(), recipe);
+    public static <C extends Container, T extends Recipe<C>> void addRecipe(RecipeHolder<T> recipe) {
+        getRecipeManager().recipes.computeIfAbsent(recipe.value().getType(), type -> Maps.newHashMap()).put(recipe.id(), recipe);
     }
 
-    public static void addRecipe(RecipeType<?> recipeType, Recipe<?> recipe) {
-        getRecipeManager().recipes.computeIfAbsent(recipeType, type -> Maps.newHashMap()).put(recipe.getId(), recipe);
+    public static <C extends Container, T extends Recipe<C>> void addRecipe(RecipeType<T> recipeType, RecipeHolder<T> recipe) {
+        getRecipeManager().recipes.computeIfAbsent(recipeType, type -> Maps.newHashMap()).put(recipe.id(), recipe);
     }
 }
