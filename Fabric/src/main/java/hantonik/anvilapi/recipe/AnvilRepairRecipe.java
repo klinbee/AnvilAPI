@@ -152,11 +152,16 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
         @Override
         public JsonObject serializeRecipe() {
             var json = new JsonObject();
-
             json.addProperty("type", serializerName.toString());
+
             this.serializeRecipeData(json);
 
             return json;
+        }
+
+        @Override
+        public ResourceLocation getId() {
+            return null;
         }
 
         @Override
@@ -174,6 +179,11 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
         @Override
         public JsonObject serializeAdvancement() {
             return advancementBuilder.serializeToJson();
+        }
+
+        @Override
+        public @Nullable ResourceLocation getAdvancementId() {
+            return null;
         }
     }
 }

@@ -11,7 +11,6 @@ import net.minecraft.world.item.ItemStack;
 public final class AAItemHelper {
     public static JsonObject serialize(Item item) {
         var json = new JsonObject();
-
         json.addProperty("item", BuiltInRegistries.ITEM.getKey(item).toString());
 
         return json;
@@ -19,14 +18,14 @@ public final class AAItemHelper {
 
     public static JsonObject serialize(ItemStack stack) {
         var json = new JsonObject();
-
         json.addProperty("item", BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
 
         if (stack.getCount() > 1)
             json.addProperty("count", stack.getCount());
 
-        if (stack.hasTag())
+        if (stack.hasTag()) {
             json.addProperty("nbt", stack.getTag().toString());
+        }
 
         return json;
     }

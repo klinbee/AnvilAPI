@@ -9,13 +9,9 @@ import hantonik.anvilapi.utils.AACraftingHelper;
 import hantonik.anvilapi.utils.AAItemHelper;
 import lombok.Getter;
 import net.minecraft.Util;
-import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.AdvancementRewards;
-import net.minecraft.advancements.CriterionTriggerInstance;
-import net.minecraft.advancements.RequirementsStrategy;
+import net.minecraft.advancements.*;
 import net.minecraft.advancements.critereon.ContextAwarePredicate;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -88,7 +84,7 @@ public class AnvilRecipe implements IAnvilRecipe {
     }
 
     protected AnvilRecipe(ResourceLocation id, ItemStack result, NonNullList<Ingredient> inputs, NonNullList<ItemStack> returns, List<CompoundTag> nbt, List<Boolean> strictNbt, List<Boolean> consumes, List<Boolean> useDurability, List<Integer> counts, boolean shapeless, int experience) {
-        this.serializerName = new ResourceLocation("anvil");
+        this.serializerName = ResourceLocation.tryBuild("minecraft","anvil");
 
         this.id = id;
         this.result = result;
@@ -148,11 +144,6 @@ public class AnvilRecipe implements IAnvilRecipe {
     }
 
     @Override
-    public ResourceLocation getId() {
-        return this.id;
-    }
-
-    @Override
     public ItemStack getResultItem(RegistryAccess access) {
         return this.result;
     }
@@ -160,6 +151,11 @@ public class AnvilRecipe implements IAnvilRecipe {
     @Override
     public NonNullList<Ingredient> getIngredients() {
         return this.inputs;
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return this.id;
     }
 
     @Override
@@ -255,7 +251,7 @@ public class AnvilRecipe implements IAnvilRecipe {
         inputs.add(container.getItem(1));
 
         if (this.shapeless) {
-            List<Integer> checked = Lists.newArrayList();
+            List<Integer> checked= new ArrayList<>();
 
             inputs.removeIf(stack -> stack == null || stack == ItemStack.EMPTY);
 
@@ -290,8 +286,8 @@ public class AnvilRecipe implements IAnvilRecipe {
                         if (!ingredientNbt.equals(input.hasTag() ? input.getTag() : new CompoundTag()))
                             continue;
                     } else
-                        if (!NbtUtils.compareNbt(ingredientNbt, input.hasTag() ? input.getTag() : new CompoundTag(), true))
-                            continue;
+                    if (!NbtUtils.compareNbt(ingredientNbt, input.hasTag() ? input.getTag() : new CompoundTag(), true))
+                        continue;
 
                     if (ingredient.test(input)) {
                         flag = true;
@@ -322,7 +318,7 @@ public class AnvilRecipe implements IAnvilRecipe {
     }
 
     @Override
-    public RecipeSerializer<IAnvilRecipe> getSerializer() {
+    public RecipeSerializer<AnvilRecipe> getSerializer() {
         return AARecipeSerializers.ANVIL;
     }
 
@@ -332,29 +328,29 @@ public class AnvilRecipe implements IAnvilRecipe {
         return this;
     }
 
-    public void build(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
+    public void build(Consumer<FinishedRecipe> output, ResourceLocation id) {
         if (this.advancementBuilder.getCriteria().isEmpty())
             throw new IllegalStateException("No way of obtaining recipe " + id);
 
         this.advancementBuilder.parent(new ResourceLocation("recipes/root"))
                 .addCriterion("has_the_recipe", new RecipeUnlockedTrigger.TriggerInstance(ContextAwarePredicate.ANY, id))
                 .rewards(AdvancementRewards.Builder.recipe(id)).requirements(RequirementsStrategy.OR);
-        consumer.accept(new Result(id));
+        output.accept(new Result(id));
     }
 
-    public static class Serializer implements RecipeSerializer<IAnvilRecipe> {
+    public static class Serializer implements RecipeSerializer<AnvilRecipe> {
         @Override
-        public IAnvilRecipe fromJson(ResourceLocation id, JsonObject json) {
+        public AnvilRecipe fromJson(ResourceLocation id, JsonObject json) {
             var result = AACraftingHelper.getItemStack(GsonHelper.getAsJsonObject(json, "result"), true, false);
 
             NonNullList<Ingredient> inputs = NonNullList.create();
 
             NonNullList<ItemStack> returns = NonNullList.create();
-            List<CompoundTag> nbt = Lists.newArrayList();
-            List<Boolean> strictNbt = Lists.newArrayList();
-            List<Boolean> consumes = Lists.newArrayList();
-            List<Boolean> useDurability = Lists.newArrayList();
-            List<Integer> counts = Lists.newArrayList();
+            List<CompoundTag> nbt= new ArrayList<>();
+            List<Boolean> strictNbt= new ArrayList<>();
+            List<Boolean> consumes= new ArrayList<>();
+            List<Boolean> useDurability= new ArrayList<>();
+            List<Integer> counts= new ArrayList<>();
 
             for (var inputElement : GsonHelper.getAsJsonArray(json, "inputs")) {
                 inputs.add(Ingredient.fromJson(inputElement));
@@ -379,7 +375,7 @@ public class AnvilRecipe implements IAnvilRecipe {
 
         @Nullable
         @Override
-        public IAnvilRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
+        public AnvilRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
             var result = buffer.readItem();
 
             var inputsSize = buffer.readInt();
@@ -395,31 +391,31 @@ public class AnvilRecipe implements IAnvilRecipe {
                 returns.add(buffer.readItem());
 
             var nbtSize = buffer.readInt();
-            List<CompoundTag> nbt = Lists.newArrayList();
+            List<CompoundTag> nbt= new ArrayList<>();
 
             for (var nbtId = 0; nbtId < nbtSize; nbtId++)
                 nbt.add(buffer.readNbt());
 
             var strictNbtSize = buffer.readInt();
-            List<Boolean> strictNbt = Lists.newArrayList();
+            List<Boolean> strictNbt= new ArrayList<>();
 
             for (var strictNbtId = 0; strictNbtId < strictNbtSize; strictNbtId++)
                 strictNbt.add(buffer.readBoolean());
 
             var consumesSize = buffer.readInt();
-            List<Boolean> consumes = Lists.newArrayList();
+            List<Boolean> consumes= new ArrayList<>();
 
             for (var consumeId = 0; consumeId < consumesSize; consumeId++)
                 consumes.add(buffer.readBoolean());
 
             var useDurabilitySize = buffer.readInt();
-            List<Boolean> useDurability = Lists.newArrayList();
+            List<Boolean> useDurability= new ArrayList<>();
 
             for (var useDurabilityId = 0; useDurabilityId < useDurabilitySize; useDurabilityId++)
                 useDurability.add(buffer.readBoolean());
 
             var countsSize = buffer.readInt();
-            List<Integer> counts = Lists.newArrayList();
+            List<Integer> counts= new ArrayList<>();
 
             for (var countId = 0; countId < countsSize; countId++)
                 counts.add(buffer.readInt());
@@ -431,46 +427,46 @@ public class AnvilRecipe implements IAnvilRecipe {
         }
 
         @Override
-        public void toNetwork(FriendlyByteBuf buffer, IAnvilRecipe recipe) {
-            buffer.writeItem(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
+        public void toNetwork(FriendlyByteBuf buffer, AnvilRecipe recipe) {
+            buffer.writeItem(recipe.result);
 
-            buffer.writeInt(recipe.getIngredients().size());
+            buffer.writeInt(recipe.inputs.size());
 
-            for (var input : recipe.getIngredients())
+            for (var input : recipe.inputs)
                 input.toNetwork(buffer);
 
-            buffer.writeInt(recipe.getReturns().size());
+            buffer.writeInt(recipe.returns.size());
 
-            for (var ret : recipe.getReturns())
+            for (var ret : recipe.returns)
                 buffer.writeItem(ret);
 
-            buffer.writeInt(recipe.getAllNbt().size());
+            buffer.writeInt(recipe.nbt.size());
 
-            for (var nbt : recipe.getAllNbt())
+            for (var nbt : recipe.nbt)
                 buffer.writeNbt(nbt);
 
-            buffer.writeInt(recipe.getStrictNbt().size());
+            buffer.writeInt(recipe.strictNbt.size());
 
-            for (var strictNbt : recipe.getStrictNbt())
+            for (var strictNbt : recipe.strictNbt)
                 buffer.writeBoolean(strictNbt);
 
-            buffer.writeInt(recipe.getConsumes().size());
+            buffer.writeInt(recipe.consumes.size());
 
-            for (var consume : recipe.getConsumes())
+            for (var consume : recipe.consumes)
                 buffer.writeBoolean(consume);
 
-            buffer.writeInt(recipe.getUseDurability().size());
+            buffer.writeInt(recipe.useDurability.size());
 
-            for (var useDurability : recipe.getUseDurability())
+            for (var useDurability : recipe.useDurability)
                 buffer.writeBoolean(useDurability);
 
-            buffer.writeInt(recipe.getCounts().size());
+            buffer.writeInt(recipe.counts.size());
 
-            for (var count : recipe.getCounts())
+            for (var count : recipe.counts)
                 buffer.writeInt(count);
 
-            buffer.writeBoolean(recipe.isShapeless());
-            buffer.writeInt(recipe.getExperience());
+            buffer.writeBoolean(recipe.shapeless);
+            buffer.writeInt(recipe.experience);
         }
     }
 
@@ -487,11 +483,15 @@ public class AnvilRecipe implements IAnvilRecipe {
         @Override
         public JsonObject serializeRecipe() {
             var json = new JsonObject();
-
             json.addProperty("type", serializerName.toString());
             this.serializeRecipeData(json);
 
             return json;
+        }
+
+        @Override
+        public ResourceLocation getId() {
+            return this.id;
         }
 
         @Override
@@ -503,8 +503,9 @@ public class AnvilRecipe implements IAnvilRecipe {
 
                 if (counts.get(inputId) != 1)
                     inputJson.addProperty("count", counts.get(inputId));
-                if (!nbt.get(inputId).isEmpty())
+                if (!nbt.get(inputId).isEmpty()) {
                     inputJson.addProperty("nbt", nbt.get(inputId).toString());
+                }
                 if (strictNbt.get(inputId))
                     inputJson.addProperty("strictNbt", strictNbt.get(inputId));
                 if (!consumes.get(inputId))
@@ -536,6 +537,11 @@ public class AnvilRecipe implements IAnvilRecipe {
         @Override
         public JsonObject serializeAdvancement() {
             return advancementBuilder.serializeToJson();
+        }
+
+        @Override
+        public @Nullable ResourceLocation getAdvancementId() {
+            return this.advancementId;
         }
     }
 }

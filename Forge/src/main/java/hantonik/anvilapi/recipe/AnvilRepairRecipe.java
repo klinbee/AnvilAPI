@@ -28,16 +28,16 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class AnvilRepairRecipe implements IAnvilRepairRecipe {
     private final ResourceLocation serializerName;
 
-    private final List<ICondition> conditions = Lists.newArrayList();
+    private final List<ICondition> conditions= new ArrayList<>();
     private final Advancement.Builder advancementBuilder = Advancement.Builder.advancement();
 
     private final ResourceLocation id;
@@ -176,6 +176,11 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
         }
 
         @Override
+        public ResourceLocation getId() {
+            return null;
+        }
+
+        @Override
         public void serializeRecipeData(JsonObject json) {
             json.add("baseItem", AAItemHelper.serialize(baseItem));
             json.add("repairItem", repairItem.toJson());
@@ -190,6 +195,11 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
         @Override
         public JsonObject serializeAdvancement() {
             return advancementBuilder.serializeToJson();
+        }
+
+        @Override
+        public @Nullable ResourceLocation getAdvancementId() {
+            return null;
         }
     }
 }

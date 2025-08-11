@@ -33,7 +33,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -44,7 +43,7 @@ import java.util.function.Consumer;
 public class AnvilRecipe implements IAnvilRecipe {
     private final ResourceLocation serializerName;
 
-    private final List<ICondition> conditions = Lists.newArrayList();
+    private final List<ICondition> conditions= new ArrayList<>();
     private final Advancement.Builder advancementBuilder = Advancement.Builder.advancement();
 
     private final ResourceLocation id;
@@ -267,7 +266,7 @@ public class AnvilRecipe implements IAnvilRecipe {
         inputs.add(container.getItem(1));
 
         if (this.shapeless) {
-            List<Integer> checked = Lists.newArrayList();
+            List<Integer> checked= new ArrayList<>();
 
             inputs.removeIf(stack -> stack == null || stack == ItemStack.EMPTY);
 
@@ -362,11 +361,11 @@ public class AnvilRecipe implements IAnvilRecipe {
             NonNullList<Ingredient> inputs = NonNullList.create();
 
             NonNullList<ItemStack> returns = NonNullList.create();
-            List<CompoundTag> nbt = Lists.newArrayList();
-            List<Boolean> strictNbt = Lists.newArrayList();
-            List<Boolean> consumes = Lists.newArrayList();
-            List<Boolean> useDurability = Lists.newArrayList();
-            List<Integer> counts = Lists.newArrayList();
+            List<CompoundTag> nbt= new ArrayList<>();
+            List<Boolean> strictNbt= new ArrayList<>();
+            List<Boolean> consumes= new ArrayList<>();
+            List<Boolean> useDurability= new ArrayList<>();
+            List<Integer> counts= new ArrayList<>();
 
             for (var inputElement : GsonHelper.getAsJsonArray(json, "inputs")) {
                 inputs.add(Ingredient.fromJson(inputElement));
@@ -407,31 +406,31 @@ public class AnvilRecipe implements IAnvilRecipe {
                 returns.add(buffer.readItem());
 
             var nbtSize = buffer.readInt();
-            List<CompoundTag> nbt = Lists.newArrayList();
+            List<CompoundTag> nbt= new ArrayList<>();
 
             for (var nbtId = 0; nbtId < nbtSize; nbtId++)
                 nbt.add(buffer.readNbt());
 
             var strictNbtSize = buffer.readInt();
-            List<Boolean> strictNbt = Lists.newArrayList();
+            List<Boolean> strictNbt= new ArrayList<>();
 
             for (var strictNbtId = 0; strictNbtId < strictNbtSize; strictNbtId++)
                 strictNbt.add(buffer.readBoolean());
 
             var consumesSize = buffer.readInt();
-            List<Boolean> consumes = Lists.newArrayList();
+            List<Boolean> consumes= new ArrayList<>();
 
             for (var consumeId = 0; consumeId < consumesSize; consumeId++)
                 consumes.add(buffer.readBoolean());
 
             var useDurabilitySize = buffer.readInt();
-            List<Boolean> useDurability = Lists.newArrayList();
+            List<Boolean> useDurability= new ArrayList<>();
 
             for (var useDurabilityId = 0; useDurabilityId < useDurabilitySize; useDurabilityId++)
                 useDurability.add(buffer.readBoolean());
 
             var countsSize = buffer.readInt();
-            List<Integer> counts = Lists.newArrayList();
+            List<Integer> counts= new ArrayList<>();
 
             for (var countId = 0; countId < countsSize; countId++)
                 counts.add(buffer.readInt());

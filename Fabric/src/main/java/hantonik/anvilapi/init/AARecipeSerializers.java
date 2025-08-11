@@ -13,7 +13,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AARecipeSerializers {
-    public static final RecipeSerializer<IAnvilRecipe> ANVIL = new AnvilRecipe.Serializer();
+    public static final RecipeSerializer<AnvilRecipe> ANVIL = new AnvilRecipe.Serializer();
     public static final RecipeSerializer<IAnvilRepairRecipe> ANVIL_REPAIR = new AnvilRepairRecipe.Serializer();
 
     public static void onInit() {
