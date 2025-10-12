@@ -71,6 +71,10 @@ public final class JeiIntegration implements IModPlugin {
         var recipesToAdd = new ArrayList<IJeiAnvilRecipe>();
         var ingredientsToAdd = new ArrayList<ItemStack>();
 
+        // Add custom anvil recipes from datapack first
+        var customRecipes = AARecipeHelper.getRecipeManager().getAllRecipesFor(AARecipeTypes.ANVIL);
+        recipesToAdd.addAll(customRecipes.stream().map(recipe -> (IJeiAnvilRecipe) recipe).toList());
+
         ((AccessorJEIRecipeManager) registration.getRecipeManager()).anvilapi$getInternal().getRecipesStream(RecipeTypes.ANVIL, registration.getJeiHelpers().getFocusFactory().getEmptyFocusGroup(), false).forEach(recipe -> {
             if (recipe.getRightInputs().stream().anyMatch(rightInput -> AADisabledRecipes.isRepairItemDisabled(rightInput) || recipe.getLeftInputs().stream().anyMatch(leftInput -> AADisabledRecipes.isRepairDisabled(leftInput, rightInput) || (rightInput.getItem() instanceof EnchantedBookItem && EnchantmentHelper.getEnchantments(rightInput).entrySet().stream().anyMatch(entry -> AADisabledRecipes.isEnchantmentDisabled(leftInput, entry.getKey(), entry.getValue())))))) {
                 registration.getRecipeManager().hideRecipes(RecipeTypes.ANVIL, Collections.singletonList(recipe));
